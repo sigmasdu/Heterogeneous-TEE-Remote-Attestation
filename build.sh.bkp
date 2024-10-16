@@ -1,0 +1,116 @@
+set -x
+set -e
+
+BUILD_TYPE=$1
+
+SGX_PATH="wrapper/sgx"
+PHYTIUM_PATH="wrapper/phytium"
+CSV_PATH="wrapper/csv"
+TDX_PATH="wrapper/tdx"
+
+# ***********************build verify****************************
+function build_verify_sgx() {
+  echo "build_verify_sgx"
+  pushd ${SGX_PATH}
+  make clean
+  make verify
+  popd
+}
+
+function build_verify_phytium() {
+  echo "build_verify_phytium"
+  pushd ${PHYTIUM_PATH}
+  make verify
+  popd
+}
+
+function build_verify_csv() {
+  echo "build_verify_csv"
+  pushd ${CSV_PATH}
+  popd
+}
+
+function build_verify_tdx() {
+  echo "build_verify_tdx skip...."
+}
+
+function build_verify() {
+  if [ ${BUILD_TYPE} ==  "verify" ]; then
+    build_verify_sgx
+    build_verify_phytium
+    build_verify_csv
+    build_verify_tdx
+  fi
+}
+
+# *************************build generator******************************
+function build_sgx_gen_proof() {
+  echo "build_sgx_gen_proof"
+  pushd ${SGX_PATH}
+  make clean
+  make
+  popd
+}
+
+function build_phytium_gen_proof() {
+  echo "build_phytium_gen_proof"
+  pushd ${PHYTIUM_PATH}
+  make
+  popd
+}
+
+function build_csv_gen_proof() {
+  echo "build_csv_gen_proof"
+  pushd ${CSV_PATH}
+  make
+  popd
+}
+
+function build_tdx_gen_proof() {
+  echo "build_tdx_gen_proof, skip..."
+}
+
+function build_gen_proof() {
+  #
+  if [ ${BUILD_TYPE} ==  "sgx" ]; then
+    build_sgx_gen_proof
+  fi
+
+  if [ ${BUILD_TYPE} ==  "phytium" ]; then
+    build_phytium_gen_proof
+  fi
+
+  if [ ${BUILD_TYPE} ==  "csv" ]; then
+    build_csv_gen_proof
+  fi
+
+  if [ ${BUILD_TYPE} ==  "tdx" ]; then
+    build_tdx_gen_proof
+  fi
+}
+
+# *******************compile proto to python****************************
+function compile_proto() {
+  echo "Compile proto file for attestation center."
+  pushd attestation_center
+  python3 -m grpc_tools.protoc \
+      --proto_path=../proto/ ../proto/hetero_attestation.proto \
+      --python_out=./ --grpc_python_out=./
+  popd
+
+  echo "Compile proto file for tee node."
+  pushd tee_node
+  python3 -m grpc_tools.protoc \
+      --proto_path=../proto/ ../proto/hetero_attestation.proto \
+      --python_out=./ --grpc_python_out=./
+  popd
+}
+
+function main() {
+  build_verify
+  build_gen_proof
+  compile_proto
+}
+
+main
+

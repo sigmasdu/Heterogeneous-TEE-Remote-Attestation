@@ -1,0 +1,85 @@
+version: '3'
+services:
+  route_server:
+    image: primihub:attestation_center_router
+    container_name: attestation_center_route_server
+    # restart: "always"
+    volumes:
+      - ./attestation_center/config.json:${ATTEST_CENTER_ROOT_PATH}/config.json
+      - ./cert:/key
+    working_dir: ${ATTEST_CENTER_ROOT_PATH}
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "python3 route_server.py --config ./config.json"
+    environment:
+      - TZ=Asia/Shanghai
+      - HTTPS_PROXY=
+      - HTTP_PROXY=
+      - https_proxy=
+      - http_proxy=
+    network_mode: host
+
+  # sgx_verify_server:
+  #   image: ${SGX_VERIFY_IMAGE}
+  #   container_name: sgx_verify_server
+  #   # restart: "always"
+  #   # volumes:
+  #   #   - ./cert:/key
+  #   working_dir: ${ATTEST_CENTER_ROOT_PATH}
+  #   entrypoint:
+  #     - "/bin/bash"
+  #     - "-c"
+  #     - "python3 verify_server.py sgx 40080"
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #     - LD_LIBRARY_PATH=/root/jinzhao_lib_sgx/lib/
+  #     - HTTPS_PROXY=
+  #     - HTTP_PROXY=
+  #     - https_proxy=
+  #     - http_proxy=
+
+  #   network_mode: host
+
+  # phytium_verify_server:
+  #   image: ${PHYTIUM_VERIFY_IMAGE}
+  #   container_name: phytium_verify_server
+  #   # restart: "always"
+  #   # volumes:
+  #   #   - ./cert:/key
+  #   working_dir: ${ATTEST_CENTER_ROOT_PATH}
+  #   entrypoint:
+  #     - "/bin/bash"
+  #     - "-c"
+  #     - "python3 verify_server.py phytium 40090"
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #     - LD_LIBRARY_PATH=/root/jinzhao_lib_phytium/lib/
+  #     - HTTPS_PROXY=
+  #     - HTTP_PROXY=
+  #     - https_proxy=
+  #     - http_proxy=
+
+  #   network_mode: host
+
+  csv_verify_server:
+    image: ${CSV_VERIFY_IMAGE}
+    container_name: csv_verify_server
+    # restart: "always"
+    # volumes:
+    #   - ./cert:/key
+    working_dir: ${ATTEST_CENTER_ROOT_PATH}
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "python3 verify_server.py csv 40091"
+    environment:
+      - TZ=Asia/Shanghai
+      - LD_LIBRARY_PATH=/root/jinzhao_lib_csv/lib/
+      - HTTPS_PROXY=
+      - HTTP_PROXY=
+      - https_proxy=
+      - http_proxy=
+
+    network_mode: host
+    # tty: true

@@ -1,0 +1,34 @@
+version: '3'
+services:
+  sgx_gen_proof_server:
+    image: primihub:generate_sgx_proof
+    container_name: sgx_gen_proof_server
+    # restart: "always"
+    volumes:
+      - ./tee_node/sgx_config.json:/Heterogeneous-TEE-Remote-Attestation/tee_node/sgx_config.json
+      - /dev/sgx:/dev/sgx
+      - attestation_data:/attestation
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    devices:
+      - /dev/sgx/enclave
+      - /dev/sgx/provision
+    working_dir: /Heterogeneous-TEE-Remote-Attestation/tee_node
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "./start_gen_proof_server.sh sgx"
+    environment:
+      - TZ=Asia/Shanghai
+      - LD_LIBRARY_PATH=/root/jinzhao_lib_sgx/lib/:/usr/lib/x86_64-linux-gnu
+      - HTTPS_PROXY=
+      - HTTP_PROXY=
+      - https_proxy=
+      - http_proxy=
+    network_mode: host
+
+volumes:
+  attestation_data:
+    external: true

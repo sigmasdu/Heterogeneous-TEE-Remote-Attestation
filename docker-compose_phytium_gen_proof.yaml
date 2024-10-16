@@ -1,0 +1,33 @@
+services:
+  phytium_gen_proof_server:
+    image: primihub:generate_phytium_proof
+    container_name: phytium_gen_proof_server
+    # restart: "always"
+    volumes:
+      - ./tee_node/phytium_config.json:/Heterogeneous-TEE-Remote-Attestation/tee_node/phytium_config.json
+      - attestation_data:/attestation
+      - /data:/data
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    devices:
+      - /dev/tee0
+      - /dev/teepriv0
+    working_dir: /Heterogeneous-TEE-Remote-Attestation/tee_node
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "./start_gen_proof_server.sh phytium"
+    environment:
+      - TZ=Asia/Shanghai
+      - LD_LIBRARY_PATH=/root/jinzhao_lib_phytium/lib/:/data/lib
+      - HTTPS_PROXY=
+      - HTTP_PROXY=
+      - https_proxy=
+      - http_proxy=
+    network_mode: host
+
+volumes:
+  attestation_data:
+    external: true

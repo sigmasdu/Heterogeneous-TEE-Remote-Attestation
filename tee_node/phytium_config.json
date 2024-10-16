@@ -1,0 +1,10 @@
+{
+  "cert_and_key_file_path": "/attestation",
+  "node_id": "phytium_node",
+  "center_attestation_service": "172.21.1.62:40060",
+  "listen_port": "40070",
+  "csr_field" : {
+    "organization_name" : "Phytium",
+    "common_name" : "D2000"
+  }
+}

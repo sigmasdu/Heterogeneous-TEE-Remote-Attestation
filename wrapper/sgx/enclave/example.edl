@@ -1,0 +1,14 @@
+enclave {
+  include "sgx_urts.h"
+  include "sgx_report.h"
+  
+  from "sgx_tstdc.edl" import sgx_oc_cpuidex;
+
+  trusted {
+    public sgx_status_t ecall_gen_report(
+      [in] sgx_target_info_t *target_info, 
+      [in, size=custom_size] uint8_t *custom_data,
+      uint32_t custom_size,
+      [out] sgx_report_t *report);     
+  };
+};

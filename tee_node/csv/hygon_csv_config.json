@@ -1,0 +1,10 @@
+{
+  "cert_and_key_file_path": "/attestation/",
+  "node_id": "hygon_csv_node",
+  "center_attestation_service": "127.0.0.1:40060",
+  "listen_port": "40070",
+  "csr_field" : {
+    "organization_name" : "hygon",
+    "common_name" : "csv"
+  }
+}

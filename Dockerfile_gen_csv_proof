@@ -1,0 +1,30 @@
+# build docker image for generate remote attestation proof
+FROM antkubetee/kubetee-dev-base:2.0-ubuntu20.04-gprc-1.24.3-pybind11
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG ROOT_PATH=/Heterogeneous-TEE-Remote-Attestation
+WORKDIR $ROOT_PATH
+ADD . $ROOT_PATH
+ARG JINZHAO_ATTEST_PATH=$ROOT_PATH/external/jinzhao-attest
+
+#build jinzhao-attest
+WORKDIR $JINZHAO_ATTEST_PATH
+RUN rm -rf build
+RUN mkdir build
+RUN bash ./build.sh --with-samples --envtype VMTEE --teetype CSV
+RUN bash ./build.sh --envtype VMTEE --teetype CSV --install
+
+ARG INSTALL_PATH=/root/jinzhao_lib_csv/
+RUN mkdir -p $INSTALL_PATH/include
+RUN mkdir -p $INSTALL_PATH/lib
+RUN cp $JINZHAO_ATTEST_PATH/build/install/* $INSTALL_PATH -r
+RUN cp $JINZHAO_ATTEST_PATH/build/*.pb.h $INSTALL_PATH/include/
+RUN cp $JINZHAO_ATTEST_PATH/build/out/libual.so $INSTALL_PATH/lib/
+# build phytium generate proof server
+WORKDIR $ROOT_PATH
+RUN bash build.sh csv
+ENV http_proxy=
+ENV https_proxy=
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=

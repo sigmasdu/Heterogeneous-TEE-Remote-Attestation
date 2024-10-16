@@ -1,0 +1,82 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
+#git_repository(
+#  name = "com_github_bazel_rules_3rdparty",
+#  commit = "67ac7942969ee2224732a9b50b17180390c4fc97",
+#  remote = "https://gitee.com/primihub/bazel-rules-thirdparty.git",
+#)
+#local_repository(
+#  name = "com_github_bazel_rules_3rdparty",
+#  path = "/root/package/bazel-rules-thirdparty",
+#)
+#http_archive(
+#  name = "zlib",
+#  build_file = "@com_github_bazel_rules_3rdparty//:zlib.BUILD",
+#  sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+#  strip_prefix = "zlib-1.2.11",
+#  urls = [
+#    "https://primihub.oss-cn-beijing.aliyuncs.com/zlib-1.2.11.tar.gz"
+#  ],
+#)
+#http_archive(
+#  name = "rules_python",
+#  strip_prefix = "rules_python-4b84ad270387a7c439ebdccfd530e2339601ef27",
+#  urls = [
+#    "https://primihub.oss-cn-beijing.aliyuncs.com/tools/rules_python-4b84ad270387a7c439ebdccfd530e2339601ef27.tar.gz",
+#  ],
+#  sha256 = "e5470e92a18aa51830db99a4d9c492cc613761d5bdb7131c04bd92b9834380f6",
+#)
+#http_archive(
+#    name = "rules_pkg",
+#    urls = [
+#        "file:///root/package/rules_pkg-0.6.0.tar.gz",
+#        #"https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
+#        #"https://github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
+#    ],
+#    #sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
+#)
+#load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+#rules_pkg_dependencies()
+#
+#http_archive(
+#  name = "bazel_skylib",
+#  strip_prefix = None,
+#  url = "https://primihub.oss-cn-beijing.aliyuncs.com/tools/bazel-skylib-1.0.2.tar.gz",
+#  sha256 = "97e70364e9249702246c0e9444bccdc4b847bed1eb03c5a3ece4f83dfe6abc44",
+#)
+#load("@bazel_skylib//lib:versions.bzl", "versions")
+#versions.check(minimum_bazel_version = "5.0.0")
+#
+#http_archive(
+#  name = "com_google_protobuf",
+#  #sha256 = "b07772d38ab07e55eca4d50f4b53da2d998bb221575c60a4f81100242d4b4889",
+#  strip_prefix = "protobuf-3.21.6",
+#  urls = [
+#    "file:///root/package/protobuf-3.21.6.tar.gz",
+#    #"https://primihub.oss-cn-beijing.aliyuncs.com/protobuf-3.20.0.tar.gz"
+#  ],
+#)
+http_archive(
+  name = "pybind11_bazel",
+  strip_prefix = "pybind11_bazel-72cbbf1fbc830e487e3012862b7b720001b70672",
+  urls = [
+    "https://primihub.oss-cn-beijing.aliyuncs.com/pybind11_bazel-72cbbf1fbc830e487e3012862b7b720001b70672.zip",
+  ],
+)
+
+# We still require the pybind library.
+http_archive(
+  name = "pybind11",
+  build_file = "@pybind11_bazel//:pybind11.BUILD",
+  strip_prefix = "pybind11-2.9.2",
+  urls = [
+    "https://primihub.oss-cn-beijing.aliyuncs.com/tools/pybind11-2.9.2.tar.gz"
+  ],
+)
+load("@pybind11_bazel//:python_configure.bzl", "python_configure")
+python_configure(name = "local_config_python", python_version = "3")
+
+local_repository(
+  name = "com_github_jinzhao",
+  path = "/root/jinzhao_lib",
+)

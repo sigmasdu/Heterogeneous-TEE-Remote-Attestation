@@ -1,0 +1,27 @@
+FROM antkubetee/kubetee-dev-base:2.0-ubuntu20.04-gprc-1.24.3-pybind11 as builder
+
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG ROOT_PATH=/Heterogeneous-TEE-Remote-Attestation
+WORKDIR $ROOT_PATH
+ADD . $ROOT_PATH
+ARG JINZHAO_ATTEST_PATH=$ROOT_PATH/external/jinzhao-attest
+WORKDIR $JINZHAO_ATTEST_PATH
+RUN pwd
+#build jinzhao-attest
+RUN bash ./build.sh --with-samples --envtype VMTEE --teetype CSV
+RUN bash ./build.sh --envtype VMTEE --teetype CSV --install
+
+RUN mkdir -p /root/jinzhao_lib_csv/lib
+RUN cp -rf build/install/* /root/jinzhao_lib_csv
+RUN cp -f build/*pb.h /root/jinzhao_lib_csv/include
+RUN cp -f build/out/libual.so  /root/jinzhao_lib_csv/lib/
+# build csv verify
+WORKDIR $ROOT_PATH
+RUN bash build.sh verify_csv
+
+ENV http_proxy=
+ENV https_proxy=
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=

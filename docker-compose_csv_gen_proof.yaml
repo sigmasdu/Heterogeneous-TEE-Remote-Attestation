@@ -1,0 +1,33 @@
+services:
+  hygon_csv_gen_proof_server:
+    image: ${CSV_PROOF_IMAGE}
+    container_name: hygon_csv_gen_proof_server
+    # restart: "always"
+    privileged: true
+    volumes:
+      - ./tee_node/csv/hygon_csv_config.json:${PROOF_GEN_ROOT_PATH}/csv/hygon_csv_config.json
+      - attestation_data:/attestation
+      - /data:/data
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    working_dir: ${PROOF_GEN_ROOT_PATH}
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - "./start_gen_proof_server.sh csv"
+    environment:
+      - TZ=Asia/Shanghai
+      - LD_LIBRARY_PATH=/root/jinzhao_lib_csv/lib/
+      - PYTHONPATH=${WRAPPER_ROOT_PATH}/csv:${PROOF_GEN_ROOT_PATH}
+      - HTTPS_PROXY=
+      - HTTP_PROXY=
+      - https_proxy=
+      - http_proxy=
+    network_mode: host
+    tty: true
+
+volumes:
+  attestation_data:
+    external: true

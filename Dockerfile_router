@@ -1,0 +1,15 @@
+# FROM antkubetee/kubetee-dev-sgx:2.0-ubuntu20.04-sgx2.17.1-py as builder
+FROM antkubetee/kubetee-dev-base:2.0-ubuntu20.04-gprc-1.24.3-pybind11 as builder
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG ROOT_PATH=/Heterogeneous-TEE-Remote-Attestation
+WORKDIR $ROOT_PATH
+ADD . $ROOT_PATH
+WORKDIR $ROOT_PATH
+RUN bash build.sh
+
+ENV http_proxy=
+ENV https_proxy=
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=

@@ -1,0 +1,34 @@
+# build docker image for generate remote attestation proof
+FROM phytium:tee_proof_image_base
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG ROOT_PATH=/Heterogeneous-TEE-Remote-Attestation
+RUN rm -fr /root/jinzhao-attest-old
+WORKDIR $ROOT_PATH
+ADD . $ROOT_PATH
+ARG JINZHAO_ATTEST_PATH=/tmp/jinzhao-attest-old
+add jinzhao-attest-old.tar.gz /tmp
+
+#build jinzhao-attest
+WORKDIR $JINZHAO_ATTEST_PATH
+RUN rm -rf build
+RUN mkdir build
+RUN bash ./build.sh --envtype TEEOS --teetype PHYTIUM --with-samples
+RUN bash ./build.sh --envtype TEEOS --teetype PHYTIUM --install
+
+ARG INSTALL_PATH=/root/jinzhao_lib_phytium/
+RUN mkdir -p $INSTALL_PATH/include
+RUN mkdir -p $INSTALL_PATH/lib
+RUN cp $JINZHAO_ATTEST_PATH/build/install/* /root/jinzhao_lib_phytium/ -r
+RUN cp $JINZHAO_ATTEST_PATH/build/*.pb.h /root/jinzhao_lib_phytium/include/
+RUN cp $JINZHAO_ATTEST_PATH/build/out/libual.so /root/jinzhao_lib_phytium/lib/
+RUN rm -fr $JINZHAO_ATTEST_PATH
+RUN rm -fr $ROOT_PATH/jinzhao-attest-old.tar.gz
+# build phytium generate proof server
+WORKDIR $ROOT_PATH
+RUN bash build.sh phytium
+ENV http_proxy=
+ENV https_proxy=
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=

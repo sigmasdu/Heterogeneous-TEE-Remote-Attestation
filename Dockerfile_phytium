@@ -1,0 +1,30 @@
+FROM antkubetee/kubetee-dev-sgx:2.0-ubuntu20.04-sgx2.17.1-py as builder
+
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG ROOT_PATH=/Heterogeneous-TEE-Remote-Attestation
+WORKDIR /tmp
+ADD jinzhao-attest-phytium.tar.gz ./
+WORKDIR /tmp/jinzhao-attest-old
+RUN pwd
+#build jinzhao-attest
+RUN rm -rf build
+RUN mkdir build
+RUN bash ./build.sh --envtype TEEOS --teetype PHYTIUM --with-samples
+RUN bash ./build.sh --envtype TEEOS --teetype PHYTIUM --install
+
+RUN mkdir -p /root/jinzhao_lib_phytium/lib
+RUN cp -rf build/install/* /root/jinzhao_lib_phytium
+RUN cp build/*pb.h /root/jinzhao_lib_phytium/include
+RUN cp build/out/libual.so  /root/jinzhao_lib_phytium/lib/
+RUN rm -fr /tmp/jinzhao-attest-old
+# build phytium verify
+WORKDIR $ROOT_PATH
+ADD . $ROOT_PATH
+RUN bash build.sh verify_phytium
+
+ENV http_proxy=
+ENV https_proxy=
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=

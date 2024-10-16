@@ -1,0 +1,14 @@
+{
+  "cert_and_key_file_path": "/key/",
+  "listen_port" : "40060",
+  "inner_sgx_verify_service": "127.0.0.1:40080",
+  "inner_phytium_verify_service": "127.0.0.1:40090",
+  "inner_csv_verify_service": "127.0.0.1:40091",
+  "cert_field": {
+    "country_name": "CN",
+    "state_or_province_name": "Beijing",
+    "locality_name": "Haidian",
+    "organization_name": "chinaunicom",
+    "common_name": "Chinaunicom"
+  }
+}

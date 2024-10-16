@@ -1,0 +1,33 @@
+# build docker image for generate remote attestation proof
+FROM antkubetee/kubetee-dev-sgx:2.0-ubuntu20.04-sgx2.17.1-py
+
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+ARG ROOT_PATH=/Heterogeneous-TEE-Remote-Attestation
+WORKDIR $ROOT_PATH
+ADD . $ROOT_PATH
+ARG JINZHAO_ATTEST_PATH=$ROOT_PATH/external/jinzhao-attest
+#build jinzhao-attest
+WORKDIR $JINZHAO_ATTEST_PATH
+ARG HETERO_TEE_TYPE=SGX
+RUN bash ./build.sh --with-samples
+RUN bash ./build.sh --install
+
+ARG INSTALL_PATH=/root/jinzhao_lib_sgx/
+RUN mkdir -p $INSTALL_PATH
+RUN mkdir -p $INSTALL_PATH/edl
+RUN cp -rf $JINZHAO_ATTEST_PATH/build/install/* $INSTALL_PATH
+RUN cp $JINZHAO_ATTEST_PATH/build/*pb.h $INSTALL_PATH/include/
+RUN cp $JINZHAO_ATTEST_PATH/ual/enclave/edl/attestation.edl $INSTALL_PATH/edl/
+# build sgx generate proof server
+WORKDIR $ROOT_PATH
+ARG SGX_ENCLAVE_LDS=$JINZHAO_ATTEST_PATH/ual/enclave/lds/enclave_SGX2.lds
+ARG SGX_ENCLAVE_KEY=$JINZHAO_ATTEST_PATH/ual/enclave/enclave_private.pem
+ARG SGX_ENCLAVE_CONFIG=$JINZHAO_ATTEST_PATH/ual/enclave/config/enclave.config.Debug.xml
+RUN bash build.sh sgx
+RUN sed -i 's/"use_secure_cert": true,/"use_secure_cert": false,/g' /etc/sgx_default_qcnl.conf
+ENV http_proxy=
+ENV https_proxy=
+ENV HTTP_PROXY=
+ENV HTTPS_PROXY=
